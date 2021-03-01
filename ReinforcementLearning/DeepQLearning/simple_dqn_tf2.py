@@ -5,11 +5,11 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import load_model
 
 class ReplayBuffer():
-    def __init__(self, max_size, input_dims):
+    def __init__(self, max_size, input_dims):    #max memory size: max_size
         self.mem_size = max_size
-        self.mem_cntr = 0
+        self.mem_cntr = 0   #keep track of our first unsaved memory 
 
-        self.state_memory = np.zeros((self.mem_size, *input_dims), 
+        self.state_memory = np.zeros((self.mem_size, *input_dims),   # * to unpack the list to elements
                                     dtype=np.float32)
         self.new_state_memory = np.zeros((self.mem_size, *input_dims),
                                 dtype=np.float32)
@@ -18,7 +18,7 @@ class ReplayBuffer():
         self.terminal_memory = np.zeros(self.mem_size, dtype=np.int32)
 
     def store_transition(self, state, action, reward, state_, done):
-        index = self.mem_cntr % self.mem_size
+        index = self.mem_cntr % self.mem_size  # 求余
         self.state_memory[index] = state
         self.new_state_memory[index] = state_
         self.reward_memory[index] = reward
@@ -28,7 +28,7 @@ class ReplayBuffer():
 
     def sample_buffer(self, batch_size):
         max_mem = min(self.mem_cntr, self.mem_size)
-        batch = np.random.choice(max_mem, batch_size, replace=False)
+        batch = np.random.choice(max_mem, batch_size, replace=False)  #the random sample is generated as if a were np.arange(max_mem), shape = batch_size, sample without replace
 
         states = self.state_memory[batch]
         states_ = self.new_state_memory[batch]
@@ -51,7 +51,7 @@ class Agent():
     def __init__(self, lr, gamma, n_actions, epsilon, batch_size,
                 input_dims, epsilon_dec=1e-3, epsilon_end=0.01,
                 mem_size=1000000, fname='dqn_model.h5'):
-        self.action_space = [i for i in range(n_actions)]
+        self.action_space = [i for i in range(n_actions)]     #discrete
         self.gamma = gamma
         self.epsilon = epsilon
         self.eps_dec = epsilon_dec
@@ -64,12 +64,12 @@ class Agent():
     def store_transition(self, state, action, reward, new_state, done):
         self.memory.store_transition(state, action, reward, new_state, done)
 
-    def choose_action(self, observation):
+    def choose_action(self, observation):  # epsilon greedy to choose action
         if np.random.random() < self.epsilon:
-            action = np.random.choice(self.action_space)
+            action = np.random.choice(self.action_space) #random select an action from action space
         else:
             state = np.array([observation])
-            actions = self.q_eval.predict(state)
+            actions = self.q_eval.predict(state)  # Q(a,s)
 
             action = np.argmax(actions)
 
@@ -77,13 +77,13 @@ class Agent():
 
     def learn(self):
         if self.memory.mem_cntr < self.batch_size:
-            return
+            return   #?
 
         states, actions, rewards, states_, dones = \
                 self.memory.sample_buffer(self.batch_size)
 
-        q_eval = self.q_eval.predict(states)
-        q_next = self.q_eval.predict(states_)
+        q_eval = self.q_eval.predict(states)  # Q(a,s)
+        q_next = self.q_eval.predict(states_)  # Q(a,s_)
 
 
         q_target = np.copy(q_eval)
