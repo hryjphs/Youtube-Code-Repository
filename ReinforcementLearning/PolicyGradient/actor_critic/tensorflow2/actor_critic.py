@@ -41,7 +41,7 @@ class Agent:
         with tf.GradientTape(persistent=True) as tape:
             state_value, probs = self.actor_critic(state)
             state_value_, _ = self.actor_critic(state_)
-            state_value = tf.squeeze(state_value)
+            state_value = tf.squeeze(state_value)   #Removes dimensions of size 1 from the shape of a tensor.
             state_value_ = tf.squeeze(state_value_)
 
             action_probs = tfp.distributions.Categorical(probs=probs)
