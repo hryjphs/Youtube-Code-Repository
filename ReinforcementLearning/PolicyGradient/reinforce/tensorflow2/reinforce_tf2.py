@@ -20,7 +20,7 @@ class Agent:
     def choose_action(self, observation):
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
         probs = self.policy(state)
-        action_probs = tfp.distributions.Categorical(probs=probs)
+        action_probs = tfp.distributions.Categorical(probs=probs)  #The Categorical distribution is parameterized by either probabilities or log-probabilities of a set of K classes. It is defined over the integers {0, 1, ..., K-1}.
         action = action_probs.sample()
 
         return action.numpy()[0]
