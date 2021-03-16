@@ -102,7 +102,7 @@ class Agent:
 
         with tf.GradientTape() as tape:
             new_policy_actions = self.actor(states)
-            actor_loss = -self.critic(states, new_policy_actions)
+            actor_loss = -self.critic(states, new_policy_actions)  # increase q(s,a(theta)) wr.t policy parameter theta
             actor_loss = tf.math.reduce_mean(actor_loss)
 
         actor_network_gradient = tape.gradient(actor_loss, 
