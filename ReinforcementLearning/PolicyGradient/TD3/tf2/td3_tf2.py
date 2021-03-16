@@ -161,7 +161,7 @@ class Agent():
 
         with tf.GradientTape(persistent=True) as tape:
             target_actions = self.target_actor(states_)
-            target_actions = target_actions + \
+            target_actions = target_actions + \                                           #target policy smoothing
                     tf.clip_by_value(np.random.normal(scale=0.2), -0.5, 0.5)
 
             target_actions = tf.clip_by_value(target_actions, self.min_action, 
@@ -173,7 +173,7 @@ class Agent():
             q1 = tf.squeeze(self.critic_1(states, actions), 1)
             q2 = tf.squeeze(self.critic_2(states, actions), 1)
 
-            # shape is [batch_size, 1], want to collapse to [batch_size]
+            # shape is [batch_size, 1], want to collapse to [batch_size]                         #clipped double Q learning
             q1_ = tf.squeeze(q1_, 1)
             q2_ = tf.squeeze(q2_, 1)
 
@@ -201,7 +201,7 @@ class Agent():
         
         self.learn_step_cntr += 1
 
-        if self.learn_step_cntr % self.update_actor_iter != 0:
+        if self.learn_step_cntr % self.update_actor_iter != 0:                                     #delayed update
             return
 
         with tf.GradientTape() as tape:
